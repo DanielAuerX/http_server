@@ -20,11 +20,18 @@ namespace
 
 namespace http
 {
-    TcpServer::TcpServer()
+    TcpServer::TcpServer(std::string ipAddress, int port) : mIpAddress(ipAddress), mPort(port), mSocket(), mNewSocket(),
+                                                            mIncomingMessage(),
+                                                            mSocketAddress(), mSocketAddressLen(sizeof(mSocketAddress)),
+                                                            mServerMessage(buildResponse())
     {
+
+        startServer();
     }
+
     TcpServer::~TcpServer()
     {
+        closeServer();
     }
 
     int TcpServer::startServer()
@@ -38,7 +45,8 @@ namespace http
         return 0;
     }
 
-    void TcpServer::closeServer(){
+    void TcpServer::closeServer()
+    {
         close(mSocket);
         close(mNewSocket);
         exit(0);
