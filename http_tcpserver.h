@@ -25,6 +25,8 @@ namespace http {
 
         int startServer();
         void closeServer();
+        void startListen();
+        void acceptConnection(int &newSocket);
         std::string buildResponse();
     };
 }
