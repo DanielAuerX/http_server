@@ -25,5 +25,6 @@ namespace http {
 
         int startServer();
         void closeServer();
+        std::string buildResponse();
     };
 }

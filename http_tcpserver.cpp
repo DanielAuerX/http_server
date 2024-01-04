@@ -25,7 +25,6 @@ namespace http
                                                             mSocketAddress(), mSocketAddressLen(sizeof(mSocketAddress)),
                                                             mServerMessage(buildResponse())
     {
-
         startServer();
     }
 
@@ -40,6 +39,11 @@ namespace http
         if (mSocket < 0)
         {
             exitWithError("Cannot create a socket");
+            return 1;
+        }
+        if (bind(mSocket, (sockaddr *)&mSocketAddress, mSocketAddressLen) < 0)
+        {
+            exitWithError("Cannot connect socket to address");
             return 1;
         }
         return 0;
