@@ -30,5 +30,6 @@ namespace http
         void acceptConnection(int &newSocket);
         std::string buildResponse();
         void sendResponse();
+        void logRequest(const char* buffer);
     };
 }

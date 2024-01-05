@@ -95,6 +95,8 @@ namespace http
             ss << "------ Received Request from client ------\n\n";
             log(ss.str());
 
+            logRequest(buffer);
+
             sendResponse();
 
             close(mNewSocket);
@@ -130,11 +132,23 @@ namespace http
 
         if (bytesSent == mServerMessage.size())
         {
-            log("------ Server Response sent to client ------\n\n");
+            log("------ Server Response sent to client ------\n");
         }
         else
         {
             log("Error sending response to client");
         }
+    }
+    void TcpServer::logRequest(const char *buffer)
+    {
+        sockaddr_in clientAddr;
+        socklen_t clientAddrLen = sizeof(clientAddr);
+        getpeername(mNewSocket, (sockaddr *)&clientAddr, &clientAddrLen);
+        std::string clientIP = inet_ntoa(clientAddr.sin_addr);
+
+        // log the raw buffer content
+        std::ostringstream logStreamRaw;
+        logStreamRaw << "Request from: " << buffer;
+        log(logStreamRaw.str());
     }
 }
