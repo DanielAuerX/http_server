@@ -3,6 +3,8 @@
 #include <iostream>
 #include <sstream>
 #include <unistd.h>
+#include <chrono>
+#include <iomanip>
 
 namespace
 {
@@ -10,7 +12,11 @@ namespace
 
     void log(const std::string &message)
     {
-        std::cout << message << std::endl;
+        auto now = std::chrono::system_clock::now();
+        auto now_time_t = std::chrono::system_clock::to_time_t(now);
+        std::ostringstream timeStream;
+        timeStream << std::put_time(std::localtime(&now_time_t), "%Y-%m-%d %X");
+        std::cout << "[" << timeStream.str() << "] " << message << std::endl;
     }
 
     void exitWithError(const std::string &errorMessage)
@@ -71,17 +77,17 @@ namespace http
             exitWithError("Socket listen failed");
         }
         std::ostringstream ss;
-        ss << "\n*** Listening on ADDRESS: "
+        ss << "*** Listening on ADDRESS: "
            << inet_ntoa(mSocketAddress.sin_addr)
            << " PORT: " << ntohs(mSocketAddress.sin_port)
-           << " ***\n\n";
+           << " ***";
         log(ss.str());
 
         int bytesReceived;
 
         while (true)
         {
-            log("====== Waiting for a new connection ======\n\n\n");
+            log("====== Waiting for a new connection ======");
             acceptConnection(mNewSocket);
 
             // reading the request
@@ -92,7 +98,7 @@ namespace http
                 exitWithError("Failed to read bytes from client socket connection");
             }
             std::ostringstream ss;
-            ss << "------ Received Request from client ------\n\n";
+            ss << "------ Received Request from client ------";
             log(ss.str());
 
             logRequest(buffer);
@@ -132,7 +138,7 @@ namespace http
 
         if (bytesSent == mServerMessage.size())
         {
-            log("------ Server Response sent to client ------\n");
+            log("------ Server Response sent to client ------");
         }
         else
         {
@@ -148,7 +154,8 @@ namespace http
 
         // log the raw buffer content
         std::ostringstream logStreamRaw;
-        logStreamRaw << "Request from: " << buffer;
+        logStreamRaw << "Request from: " << clientIP << "\n"
+                     << buffer;
         log(logStreamRaw.str());
     }
 }
