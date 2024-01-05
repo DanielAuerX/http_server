@@ -1,10 +1,13 @@
 #include "http_tcpserver.h"
+#include "pages.h"
 
 #include <iostream>
 #include <sstream>
 #include <unistd.h>
 #include <chrono>
 #include <iomanip>
+#include <cstring>
+#include <stdexcept>
 
 namespace
 {
@@ -13,9 +16,9 @@ namespace
     void log(const std::string &message)
     {
         auto now = std::chrono::system_clock::now();
-        auto now_time_t = std::chrono::system_clock::to_time_t(now);
+        time_t nowTimeT = std::chrono::system_clock::to_time_t(now);
         std::ostringstream timeStream;
-        timeStream << std::put_time(std::localtime(&now_time_t), "%Y-%m-%d %X");
+        timeStream << std::put_time(std::localtime(&nowTimeT), "%Y-%m-%d %X");
         std::cout << "[" << timeStream.str() << "] " << message << std::endl;
     }
 
@@ -30,8 +33,7 @@ namespace http
 {
     TcpServer::TcpServer(std::string ipAddress, int port) : mIpAddress(ipAddress), mPort(port), mSocket(), mNewSocket(),
                                                             mIncomingMessage(),
-                                                            mSocketAddress(), mSocketAddressLen(sizeof(mSocketAddress)),
-                                                            mServerMessage(buildResponse())
+                                                            mSocketAddress(), mSocketAddressLen(sizeof(mSocketAddress))
     {
         mSocketAddress.sin_family = AF_INET;
         mSocketAddress.sin_port = htons(mPort);
@@ -103,20 +105,14 @@ namespace http
 
             logRequest(buffer);
 
-            sendResponse();
+            std::string request = extractRequest(buffer);
+
+            std::string serverMessage = handleRequest(request);
+
+            sendResponse(serverMessage);
 
             close(mNewSocket);
         }
-    }
-
-    std::string TcpServer::buildResponse()
-    {
-        std::string htmlFile = "<!DOCTYPE html><html lang=\"en\"><body><h1> HOME </h1><p> Hellow from the server</p></body></html>";
-        std::ostringstream ss;
-        ss << "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: " << htmlFile.size() << "\n\n"
-           << htmlFile;
-
-        return ss.str();
     }
 
     void TcpServer::acceptConnection(int &newSocket)
@@ -130,13 +126,13 @@ namespace http
         }
     }
 
-    void TcpServer::sendResponse()
+    void TcpServer::sendResponse(const std::string &serverMessage)
     {
         long bytesSent;
 
-        bytesSent = write(mNewSocket, mServerMessage.c_str(), mServerMessage.size());
+        bytesSent = write(mNewSocket, serverMessage.c_str(), serverMessage.size());
 
-        if (bytesSent == mServerMessage.size())
+        if (bytesSent == serverMessage.size())
         {
             log("------ Server Response sent to client ------");
         }
@@ -157,5 +153,33 @@ namespace http
         logStreamRaw << "Request from: " << clientIP << "\n"
                      << buffer;
         log(logStreamRaw.str());
+    }
+
+    std::string TcpServer::extractRequest(const char *buffer)
+    {
+        const char *getStart = strstr(buffer, "GET ");
+        if (getStart != nullptr)
+        {
+            const char *requestStart = strstr(getStart + 4, " HTTP/1.1");
+            if (requestStart != nullptr)
+            {
+                size_t length = requestStart - (getStart + 4); // length of request part
+                return std::string(getStart + 4, length);
+            }
+        }
+        return std::string();
+    }
+    
+    std::string TcpServer::handleRequest(const std::string &request)
+    {
+        if (request == "/")
+        {
+            return html::getHomepage();
+        }
+        if (request == "/otherpage")
+        {
+            return html::getOtherPage();
+        }
+        return html::get404Page();
     }
 }

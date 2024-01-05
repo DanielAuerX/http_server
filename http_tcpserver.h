@@ -23,13 +23,14 @@ namespace http
         long mIncomingMessage;
         struct sockaddr_in mSocketAddress;
         unsigned int mSocketAddressLen;
-        std::string mServerMessage;
 
         int startServer();
         void closeServer();
         void acceptConnection(int &newSocket);
         std::string buildResponse();
-        void sendResponse();
+        void sendResponse(const std::string &serverMessage);
         void logRequest(const char* buffer);
+        std::string extractRequest(const char* buffer);
+        std::string handleRequest(const std::string &request);
     };
 }
