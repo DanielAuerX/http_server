@@ -169,16 +169,20 @@ namespace http
         }
         return std::string();
     }
-    
+
     std::string TcpServer::handleRequest(const std::string &request)
     {
         if (request == "/")
         {
             return html::getHomepage();
         }
-        if (request == "/otherpage")
+        if (request == "/dog")
         {
             return html::getOtherPage();
+        }
+        if (request == "/cute_doggy.jpg")
+        {
+            return html::getImage("cute_doggy.jpg");
         }
         return html::get404Page();
     }
