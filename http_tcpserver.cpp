@@ -172,18 +172,20 @@ namespace http
 
     std::string TcpServer::handleRequest(const std::string &request)
     {
+        html::PageWizard pageWizard;
+
         if (request == "/")
         {
-            return html::getHomepage();
+            return pageWizard.getHomepage();
         }
         if (request == "/dog")
         {
-            return html::getOtherPage();
+            return pageWizard.getDogPage();
         }
         if (request == "/cute_doggy.jpg")
         {
-            return html::getImage("cute_doggy.jpg");
+            return pageWizard.getImage("cute_doggy.jpg");
         }
-        return html::get404Page();
+        return pageWizard.get404Page();
     }
 }
