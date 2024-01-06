@@ -20,6 +20,5 @@ namespace html
     private:
         const std::string textHeader;
         const std::string imageHeader;
-    }
-
+    };
 }
