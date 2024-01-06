@@ -69,7 +69,6 @@ namespace http
         log("Closing server...");
         close(mSocket);
         close(mNewSocket);
-        exit(0);
     }
 
     void TcpServer::startListen()
