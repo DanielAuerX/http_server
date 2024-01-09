@@ -8,29 +8,39 @@ namespace html
 {
 
     PageWizard::PageWizard() : textHeader("HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: "),
-                               imageHeader("HTTP/1.1 200 OK\nContent-Type: image/jpeg\nContent-Length: ")
+                               imageHeader("HTTP/1.1 200 OK\nContent-Type: image/jpeg\nContent-Length: "),
+                               cssHeader("HTTP/1.1 200 OK\nContent-Type: text/css\nContent-Length: "),
+                               fileLocation("../frontend/")
     {
+    }
+
+    std::string PageWizard::loadHTMLFromFile(const std::string &filename)
+    {
+        std::ifstream file(filename);
+        if (!file.is_open())
+        {
+            return "<!DOCTYPE html><html lang=\"en\"><body><h1> ERROR 500 </h1><p> SERVER ERROR: CAN NOT LOAD THE HTML!</p></body></html>";
+        }
+        std::ostringstream buffer;
+        buffer << file.rdbuf();
+        return buffer.str();
     }
 
     std::string PageWizard::getHomepage()
     {
-        std::string htmlFile = "<!DOCTYPE html><html lang=\"en\"><body><h1> HOME </h1><p> Hellow from the server</p><p></p><button onclick=\"window.location.href='/dog'\" style=\"font-size: 20px; padding: 10px 20px;\">View cute dog</button></body></html>";
+        std::string homeHtml = loadHTMLFromFile(fileLocation + "homepage.html");
         std::ostringstream ss;
-        ss << textHeader << htmlFile.size() << "\n\n"
-           << htmlFile;
+        ss << textHeader << homeHtml.size() << "\n\n"
+           << homeHtml;
         return ss.str();
     }
 
     std::string PageWizard::getDogPage()
     {
-        std::ostringstream htmlResponse;
-        htmlResponse << "<!DOCTYPE html><html lang=\"en\"><body>";
-        htmlResponse << "<h1> CUTEST DOGGY </h1><p> The cutest doggy world wide!</p>";
-        htmlResponse << "<img src=\"cute_doggy.jpg\" alt=\"the cutest doggy\" style=\"width: 40%;\">";
-        htmlResponse << "<p></p><button onclick=\"window.location.href='/'\" style=\"font-size: 20px; padding: 10px 20px;\">Return home</button></body></html>";
+        std::string dogHtml = loadHTMLFromFile(fileLocation + "dogpage.html");
         std::ostringstream ss;
-        ss << textHeader << htmlResponse.str().size() << "\n\n"
-           << htmlResponse.str();
+        ss << textHeader << dogHtml.size() << "\n\n"
+           << dogHtml;
         return ss.str();
     }
 
@@ -52,11 +62,23 @@ namespace html
 
     std::string PageWizard::get404Page()
     {
-        std::string htmlFile = "<!DOCTYPE html><html lang=\"en\"><body><h1> ERROR 404 </h1><p> THE PAGE YOU ARE LOOKING FOR DOES NOT EXIST!</p><button onclick=\"window.location.href='/'\">Home</button></body></html>";
+        std::string errorHtml = loadHTMLFromFile(fileLocation + "404.html");
         std::ostringstream ss;
-        ss << textHeader << htmlFile.size() << "\n\n"
-           << htmlFile;
+        ss << textHeader << errorHtml.size() << "\n\n"
+           << errorHtml;
         return ss.str();
     }
 
+    std::string PageWizard::getCss()
+    {
+        std::ifstream cssFile(fileLocation + "styles.css");
+        std::ostringstream cssBuffer;
+        cssBuffer << cssFile.rdbuf();
+        std::string cssContent = cssBuffer.str();
+
+        std::ostringstream response;
+        response << cssHeader << cssContent.size() << "\n\n" << cssContent;
+
+        return response.str();
+    }
 }

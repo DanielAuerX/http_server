@@ -185,6 +185,10 @@ namespace http
         {
             return pageWizard.getImage("cute_doggy.jpg");
         }
+        if (request == "/styles.css")
+        {
+            return pageWizard.getCss();
+        }
         return pageWizard.get404Page();
     }
 }
