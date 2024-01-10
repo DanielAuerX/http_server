@@ -7,10 +7,7 @@
 namespace html
 {
 
-    PageWizard::PageWizard() : textHeader("HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: "),
-                               imageHeader("HTTP/1.1 200 OK\nContent-Type: image/jpeg\nContent-Length: "),
-                               cssHeader("HTTP/1.1 200 OK\nContent-Type: text/css\nContent-Length: "),
-                               fileLocation("../frontend/")
+    PageWizard::PageWizard() : fileLocation("../frontend/")
     {
     }
 
@@ -30,33 +27,30 @@ namespace html
     {
         std::string homeHtml = loadHTMLFromFile(fileLocation + "homepage.html");
         std::ostringstream ss;
-        ss << textHeader << homeHtml.size() << "\n\n"
-           << homeHtml;
+        ss << getHeader("text/html", homeHtml.size()) << "\n\n" << homeHtml;
         std::string response = ss.str();
         return setUsername(cookie, response);
-
     }
 
     std::string PageWizard::getHomepageWithCookie(const std::string &cookie)
     {
         std::string homeHtml = loadHTMLFromFile(fileLocation + "homepage.html");
-        std::ostringstream ss;
+        std::ostringstream response;
         std::string cookieWithAge = "user=" + cookie + "; Max-Age=864000";
 
-        ss << textHeader << homeHtml.size() << "\n";
-        ss << "Set-Cookie: " << cookieWithAge << "\n\n";
-        ss << homeHtml;
-        std::string response = ss.str();
-        return setUsername(cookie, response);
+        response << getHeader("text/html", homeHtml.size()) << "\n";
+        response << "Set-Cookie: " << cookieWithAge << "\n\n";
+        response << homeHtml;
+        std::string genericResponse = response.str();
+        return setUsername(cookie, genericResponse);
     }
 
     std::string PageWizard::getDogPage()
     {
         std::string dogHtml = loadHTMLFromFile(fileLocation + "dogpage.html");
-        std::ostringstream ss;
-        ss << textHeader << dogHtml.size() << "\n\n"
-           << dogHtml;
-        return ss.str();
+        std::ostringstream response;
+        response << getHeader("text/html", dogHtml.size()) << "\n\n" << dogHtml;
+        return response.str();
     }
 
     std::string PageWizard::getImage(std::string fileName)
@@ -68,7 +62,7 @@ namespace html
         std::string imageContent = imageBuffer.str();
 
         std::ostringstream response;
-        response << imageHeader << imageContent.size() << "\n\n";
+        response << getHeader("image/jpeg", imageContent.size()) << "\n\n";
         response << imageContent;
 
         return response.str();
@@ -77,10 +71,9 @@ namespace html
     std::string PageWizard::get404Page()
     {
         std::string errorHtml = loadHTMLFromFile(fileLocation + "404.html");
-        std::ostringstream ss;
-        ss << textHeader << errorHtml.size() << "\n\n"
-           << errorHtml;
-        return ss.str();
+        std::ostringstream response;
+        response << getHeader("text/html", errorHtml.size()) << "\n\n" << errorHtml;
+        return response.str();
     }
 
     std::string PageWizard::getCss()
@@ -91,7 +84,7 @@ namespace html
         std::string cssContent = cssBuffer.str();
 
         std::ostringstream response;
-        response << cssHeader << cssContent.size() << "\n\n"
+        response << getHeader("text/css", cssContent.size()) << "\n\n"
                  << cssContent;
 
         return response.str();
@@ -99,10 +92,9 @@ namespace html
     std::string PageWizard::getIndex()
     {
         std::string indexHtml = loadHTMLFromFile(fileLocation + "index.html");
-        std::ostringstream ss;
-        ss << textHeader << indexHtml.size() << "\n\n"
-           << indexHtml;
-        return ss.str();
+        std::ostringstream response;
+        response << getHeader("text/html", indexHtml.size()) << "\n\n" << indexHtml;
+        return response.str();
     }
     const std::string &PageWizard::setUsername(const std::string &username, std::string &page)
     {
@@ -112,7 +104,7 @@ namespace html
         {
             cleanedUsername.replace(plusPos, 1, " ");
         }
-        
+
         std::string toFind = "#USER#";
         size_t startPos = page.find(toFind);
         if (startPos != std::string::npos)
@@ -124,5 +116,12 @@ namespace html
         {
             return page;
         }
+    }
+
+    const std::string &PageWizard::getHeader(const std::string &type, const std::size_t &length)
+    {
+        std::ostringstream header;
+        header << "HTTP/1.1 200 OK\nContent-Type: " << type << "\nContent-Length: " << length;
+        return header.str();
     }
 }
