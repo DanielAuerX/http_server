@@ -28,9 +28,9 @@ namespace html
 
         std::string loadHTMLFromFile(const std::string &filename);
         
-        const std::string& setUsername(const std::string &username, std::string &page);
+        std::string setUsername(const std::string &username, std::string &page);
 
-        const std::string& getHeader(const std::string &type, const std::size_t &length);
+        std::string getHeader(const std::string &type, const std::size_t &length);
 
     };
 }

@@ -96,7 +96,8 @@ namespace html
         response << getHeader("text/html", indexHtml.size()) << "\n\n" << indexHtml;
         return response.str();
     }
-    const std::string &PageWizard::setUsername(const std::string &username, std::string &page)
+    
+    std::string PageWizard::setUsername(const std::string &username, std::string &page)
     {
         std::string cleanedUsername = username;
         size_t plusPos = cleanedUsername.find("+");
@@ -118,7 +119,7 @@ namespace html
         }
     }
 
-    const std::string &PageWizard::getHeader(const std::string &type, const std::size_t &length)
+    std::string PageWizard::getHeader(const std::string &type, const std::size_t &length)
     {
         std::ostringstream header;
         header << "HTTP/1.1 200 OK\nContent-Type: " << type << "\nContent-Length: " << length;
