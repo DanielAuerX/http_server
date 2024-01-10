@@ -53,7 +53,7 @@ namespace html
         return response.str();
     }
 
-    std::string PageWizard::getImage(std::string fileName)
+    std::string PageWizard::getImage(std::string &fileName)
     {
         std::string filePath = "resources/" + fileName;
         std::ifstream imageFile(filePath, std::ios::binary);

@@ -15,7 +15,7 @@ namespace html
 
         std::string getDogPage();
 
-        std::string getImage(std::string fileName);
+        std::string getImage(std::string &fileName);
 
         std::string get404Page();
 
