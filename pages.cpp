@@ -106,11 +106,18 @@ namespace html
     }
     const std::string &PageWizard::setUsername(const std::string &username, std::string &page)
     {
+        std::string cleanedUsername = username;
+        size_t plusPos = cleanedUsername.find("+");
+        if (plusPos != std::string::npos)
+        {
+            cleanedUsername.replace(plusPos, 1, " ");
+        }
+        
         std::string toFind = "#USER#";
         size_t startPos = page.find(toFind);
         if (startPos != std::string::npos)
         {
-            page.replace(startPos, toFind.length(), username);
+            page.replace(startPos, toFind.length(), cleanedUsername);
             return page;
         }
         else
