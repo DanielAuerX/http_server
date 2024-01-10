@@ -11,7 +11,9 @@ namespace html
 
         std::string loadHTMLFromFile(const std::string &filename);
 
-        std::string getHomepage();
+        std::string getHomepage(const std::string &cookie);
+
+        std::string getHomepageWithCookie(const std::string &cookie);
 
         std::string getDogPage();
 
@@ -20,6 +22,10 @@ namespace html
         std::string get404Page();
 
         std::string getCss();
+
+        std::string getIndex();
+
+        const std::string& setUsername(const std::string &username, std::string &page);
 
     private:
         const std::string textHeader;

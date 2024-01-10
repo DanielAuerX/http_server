@@ -27,10 +27,10 @@ namespace http
         int startServer();
         void closeServer();
         void acceptConnection(int &newSocket);
-        std::string buildResponse();
         void sendResponse(const std::string &serverMessage);
-        void logRequest(const char* buffer);
-        std::string extractRequest(const char* buffer);
-        std::string handleRequest(const std::string &request);
+        void logRequest(const char *buffer);
+        std::string extractRequest(const char *buffer);
+        std::string extractCookie(const char *buffer);
+        std::string handleRequest(const std::string &request, const std::string &cookie);
     };
 }

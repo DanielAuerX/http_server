@@ -26,13 +26,28 @@ namespace html
         return buffer.str();
     }
 
-    std::string PageWizard::getHomepage()
+    std::string PageWizard::getHomepage(const std::string &cookie)
     {
         std::string homeHtml = loadHTMLFromFile(fileLocation + "homepage.html");
         std::ostringstream ss;
         ss << textHeader << homeHtml.size() << "\n\n"
            << homeHtml;
-        return ss.str();
+        std::string response = ss.str();
+        return setUsername(cookie, response);
+
+    }
+
+    std::string PageWizard::getHomepageWithCookie(const std::string &cookie)
+    {
+        std::string homeHtml = loadHTMLFromFile(fileLocation + "homepage.html");
+        std::ostringstream ss;
+        std::string cookieWithAge = "user=" + cookie + "; Max-Age=864000";
+
+        ss << textHeader << homeHtml.size() << "\n";
+        ss << "Set-Cookie: " << cookieWithAge << "\n\n";
+        ss << homeHtml;
+        std::string response = ss.str();
+        return setUsername(cookie, response);
     }
 
     std::string PageWizard::getDogPage()
@@ -46,7 +61,6 @@ namespace html
 
     std::string PageWizard::getImage(std::string fileName)
     {
-        // read image file content and respond with correct headers
         std::string filePath = "resources/" + fileName;
         std::ifstream imageFile(filePath, std::ios::binary);
         std::ostringstream imageBuffer;
@@ -77,8 +91,31 @@ namespace html
         std::string cssContent = cssBuffer.str();
 
         std::ostringstream response;
-        response << cssHeader << cssContent.size() << "\n\n" << cssContent;
+        response << cssHeader << cssContent.size() << "\n\n"
+                 << cssContent;
 
         return response.str();
+    }
+    std::string PageWizard::getIndex()
+    {
+        std::string indexHtml = loadHTMLFromFile(fileLocation + "index.html");
+        std::ostringstream ss;
+        ss << textHeader << indexHtml.size() << "\n\n"
+           << indexHtml;
+        return ss.str();
+    }
+    const std::string &PageWizard::setUsername(const std::string &username, std::string &page)
+    {
+        std::string toFind = "#USER#";
+        size_t startPos = page.find(toFind);
+        if (startPos != std::string::npos)
+        {
+            page.replace(startPos, toFind.length(), username);
+            return page;
+        }
+        else
+        {
+            return page;
+        }
     }
 }

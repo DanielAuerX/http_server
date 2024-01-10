@@ -60,3 +60,43 @@ img {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+.styled-form {
+    margin-top: 100px; /* Adjust as needed */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.styled-form label {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.styled-form input[type="text"] {
+    font-size: 20px;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    width: 200px;
+}
+font-size: 22px;
+.styled-form button {
+    background-color: #4CAF50;
+    color: white;
+    font-size: 18px;
+    padding: 12px 24px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.styled-form button:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
+}
+

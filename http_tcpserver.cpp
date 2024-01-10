@@ -69,6 +69,7 @@ namespace http
         log("Closing server...");
         close(mSocket);
         close(mNewSocket);
+        exit(0);
     }
 
     void TcpServer::startListen()
@@ -105,8 +106,9 @@ namespace http
             logRequest(buffer);
 
             std::string request = extractRequest(buffer);
+            std::string cookie = extractCookie(buffer);
 
-            std::string serverMessage = handleRequest(request);
+            std::string serverMessage = handleRequest(request, cookie);
 
             sendResponse(serverMessage);
 
@@ -169,13 +171,43 @@ namespace http
         return std::string();
     }
 
-    std::string TcpServer::handleRequest(const std::string &request)
+    std::string TcpServer::extractCookie(const char *buffer)
+    {
+        const char *prefix = "Cookie: user=";
+        const char *getStart = strstr(buffer, prefix);
+        if (getStart != nullptr)
+        {
+            getStart += strlen(prefix);
+            const char *endPtr = strchr(getStart, '\n');
+            if (endPtr != nullptr)
+            {
+                size_t length = endPtr - getStart;
+                return std::string(getStart, length);
+            }
+        }
+        return std::string();
+    }
+
+    std::string TcpServer::handleRequest(const std::string &request, const std::string &cookie)
     {
         html::PageWizard pageWizard;
 
+        if (request.find("/?user=") != std::string::npos)
+        {
+            std::string cookie = request.substr(7);
+            return pageWizard.getHomepageWithCookie(cookie);
+        }
+        if (request == "/styles.css")
+        {
+            return pageWizard.getCss();
+        }
+        if (cookie == "")
+        {
+            return pageWizard.getIndex();
+        }
         if (request == "/")
         {
-            return pageWizard.getHomepage();
+            return pageWizard.getHomepage(cookie);
         }
         if (request == "/dog")
         {
@@ -191,4 +223,5 @@ namespace http
         }
         return pageWizard.get404Page();
     }
+
 }
