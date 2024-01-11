@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cache.h"
+
 #include <stdio.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -23,6 +25,7 @@ namespace http
         long mIncomingMessage;
         struct sockaddr_in mSocketAddress;
         unsigned int mSocketAddressLen;
+        memory::Cache mCache;
 
         int startServer();
         void closeServer();

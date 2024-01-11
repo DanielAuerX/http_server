@@ -33,7 +33,9 @@ namespace http
 {
     TcpServer::TcpServer(std::string ipAddress, int port) : mIpAddress(ipAddress), mPort(port), mSocket(), mNewSocket(),
                                                             mIncomingMessage(),
-                                                            mSocketAddress(), mSocketAddressLen(sizeof(mSocketAddress))
+                                                            mSocketAddress(),
+                                                            mSocketAddressLen(sizeof(mSocketAddress)),
+                                                            mCache(memory::Cache())
     {
         mSocketAddress.sin_family = AF_INET;
         mSocketAddress.sin_port = htons(mPort);
@@ -192,6 +194,11 @@ namespace http
     {
         html::PageWizard pageWizard;
 
+        if (mCache.contains(request) && cookie != "")
+        {
+            return mCache.retrieve(request);
+        }
+
         if (request.find("/?user=") != std::string::npos)
         {
             std::string cookie = request.substr(7);
@@ -199,11 +206,15 @@ namespace http
         }
         if (request == "/styles.css")
         {
-            return pageWizard.getCss();
+            const std::string response = pageWizard.getCss();
+            mCache.add(request, response);
+            return response;
         }
         if (cookie == "")
         {
-            return pageWizard.getIndex();
+            const std::string response = pageWizard.getIndex();
+            mCache.add(request, response);
+            return response;
         }
         if (request == "/")
         {
@@ -211,17 +222,19 @@ namespace http
         }
         if (request == "/dog")
         {
-            return pageWizard.getDogPage();
+            const std::string response = pageWizard.getDogPage();
+            mCache.add(request, response);
+            return response;
         }
         if (request == "/cute_doggy.jpg")
         {
-            return pageWizard.getImage("cute_doggy.jpg");
+            const std::string response = pageWizard.getImage("cute_doggy.jpg");
+            mCache.add(request, response);
+            return response;
         }
-        if (request == "/styles.css")
-        {
-            return pageWizard.getCss();
-        }
-        return pageWizard.get404Page();
+        const std::string response = pageWizard.get404Page();
+        mCache.add(request, response);
+        return response;
     }
 
 }
