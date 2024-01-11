@@ -1,5 +1,6 @@
 #pragma once
 
+#include "utils.h"
 #include <string>
 
 namespace html
@@ -26,11 +27,10 @@ namespace html
     private:
         const std::string fileLocation;
 
-        std::string loadHTMLFromFile(const std::string &filename);
-        
+        const utils::SwissArmyToolbox swissArmyToolbox;
+
         std::string setUsername(const std::string &username, std::string &page);
 
         std::string getHeader(const std::string &type, const std::size_t &length);
-
     };
 }
