@@ -1,4 +1,4 @@
-#include "pages.h"
+#include "../include/pages.h"
 
 #include <sstream>
 #include <streambuf>

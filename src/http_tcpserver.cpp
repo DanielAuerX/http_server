@@ -1,5 +1,5 @@
-#include "http_tcpserver.h"
-#include "pages.h"
+#include "../include/http_tcpserver.h"
+#include "../include/pages.h"
 
 #include <iostream>
 #include <sstream>
