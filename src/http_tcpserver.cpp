@@ -1,41 +1,20 @@
 #include "../include/http_tcpserver.h"
 #include "../include/pages.h"
 
-#include <iostream>
 #include <sstream>
 #include <unistd.h>
-#include <chrono>
-#include <iomanip>
 #include <cstring>
-#include <stdexcept>
-
-namespace
-{
-    const int BUFFER_SIZE = 30720;
-
-    void log(const std::string &message)
-    {
-        auto now = std::chrono::system_clock::now();
-        time_t nowTimeT = std::chrono::system_clock::to_time_t(now);
-        std::ostringstream timeStream;
-        timeStream << std::put_time(std::localtime(&nowTimeT), "%Y-%m-%d %X");
-        std::cout << "[" << timeStream.str() << "] " << message << std::endl;
-    }
-
-    void exitWithError(const std::string &errorMessage)
-    {
-        log("ERROR: " + errorMessage);
-        exit(1);
-    }
-}
 
 namespace http
 {
+    const int BUFFER_SIZE = 30720;
+
     TcpServer::TcpServer(std::string ipAddress, int port) : mIpAddress(ipAddress), mPort(port), mSocket(), mNewSocket(),
                                                             mIncomingMessage(),
                                                             mSocketAddress(),
                                                             mSocketAddressLen(sizeof(mSocketAddress)),
-                                                            mCache(memory::Cache())
+                                                            mCache(memory::Cache()),
+                                                            mToolbox(utils::SwissArmyToolbox())
     {
         mSocketAddress.sin_family = AF_INET;
         mSocketAddress.sin_port = htons(mPort);
@@ -51,7 +30,7 @@ namespace http
 
     int TcpServer::startServer()
     {
-        log("Starting server...");
+        mToolbox.log("Starting server...");
         mSocket = socket(AF_INET, SOCK_STREAM, 0);
         if (mSocket < 0)
         {
@@ -68,7 +47,7 @@ namespace http
 
     void TcpServer::closeServer()
     {
-        log("Closing server...");
+        mToolbox.log("Closing server...");
         close(mSocket);
         close(mNewSocket);
         exit(0);
@@ -85,13 +64,13 @@ namespace http
            << inet_ntoa(mSocketAddress.sin_addr)
            << " PORT: " << ntohs(mSocketAddress.sin_port)
            << " ***";
-        log(ss.str());
+        mToolbox.log(ss.str());
 
         int bytesReceived;
 
         while (true)
         {
-            log("====== Waiting for a new connection ======");
+            mToolbox.log("====== Waiting for a new connection ======");
             acceptConnection(mNewSocket);
 
             // reading the request
@@ -103,7 +82,7 @@ namespace http
             }
             std::ostringstream ss;
             ss << "------ Received Request from client ------";
-            log(ss.str());
+            mToolbox.log(ss.str());
 
             logRequest(buffer);
 
@@ -137,11 +116,11 @@ namespace http
 
         if (bytesSent == serverMessage.size())
         {
-            log("------ Server Response sent to client ------");
+            mToolbox.log("------ Server Response sent to client ------");
         }
         else
         {
-            log("Error sending response to client");
+            mToolbox.log("Error sending response to client");
         }
     }
     void TcpServer::logRequest(const char *buffer)
@@ -155,7 +134,13 @@ namespace http
         std::ostringstream logStreamRaw;
         logStreamRaw << "Request from: " << clientIP << "\n"
                      << buffer;
-        log(logStreamRaw.str());
+        mToolbox.log(logStreamRaw.str());
+    }
+
+    void TcpServer::exitWithError(const std::string &errorMessage)
+    {
+        mToolbox.log("ERROR: " + errorMessage);
+        exit(1);
     }
 
     std::string TcpServer::extractRequest(const char *buffer)

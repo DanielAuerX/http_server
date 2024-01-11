@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cache.h"
+#include "utils.h"
 
 #include <stdio.h>
 #include <sys/socket.h>
@@ -26,6 +27,7 @@ namespace http
         struct sockaddr_in mSocketAddress;
         unsigned int mSocketAddressLen;
         memory::Cache mCache;
+        utils::SwissArmyToolbox mToolbox;
 
         int startServer();
         void closeServer();
@@ -35,5 +37,7 @@ namespace http
         std::string extractRequest(const char *buffer);
         std::string extractCookie(const char *buffer);
         std::string handleRequest(const std::string &request, const std::string &cookie);
+        void exitWithError(const std::string &errorMessage);
+
     };
 }
